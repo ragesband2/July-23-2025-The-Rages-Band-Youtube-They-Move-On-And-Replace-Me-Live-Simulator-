@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Channel Growth Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .neon-button {
+            position: relative;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .neon-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 0, 0, 0.7),
+                rgba(255, 165, 0, 0.7),
+                rgba(255, 255, 0, 0.7),
+                rgba(0, 128, 0, 0.7),
+                rgba(0, 0, 255, 0.7),
+                rgba(75, 0, 130, 0.7),
+                rgba(238, 130, 238, 0.7),
+                rgba(0, 255, 255, 0.7),
+                rgba(255, 0, 255, 0.7)
+            );
+            transform: rotate(45deg);
+            animation: glow 2s ease-in-out infinite alternate;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        .neon-button:hover::before {
+            opacity: 1;
+        }
+        
+        .neon-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+        }
+        
+        @keyframes glow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .dialog {
+            background: rgba(30, 30, 50, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            width: 1380px;
+            height: 600px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .dialog-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ffff;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: #ff00ff;
+        }
+        
+        .stats-container {
+            display: flex;
+            height: calc(100% - 80px);
+        }
+        
+        .stats-sidebar {
+            width: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #00ffff;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            position: relative;
+            animation: hueRotate 5s ease-in-out infinite;
+        }
+        
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes hueRotate {
+            0% { filter: hue-rotate(0deg) saturate(1); }
+            50% { filter: hue-rotate(180deg) saturate(2); }
+            100% { filter: hue-rotate(360deg) saturate(1); }
+        }
+        
+        .channel-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .channel-stats {
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #00ffff;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .video-container {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .video-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .growth-chart {
+            height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0, 255, 255, 0.1), transparent);
+        }
+        
+        .chart-data {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #00ffff, transparent);
+            margin: 0 1px;
+            transition: height 0.5s ease;
+        }
+        
+        .table-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #00ffff;
+            font-size: 1.2rem;
+        }
+        
+        .loading-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(to right, #00ffff, #ff00ff);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .transcript-container {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .transcript-section {
+            margin-bottom: 20px;
+        }
+        
+        .transcript-title {
+            font-size: 1.2rem;
+            color: #00ffff;
+            margin-bottom: 10px;
+        }
+        
+        .transcript-data {
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .realtime-clock {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        /* Main View Graph Styles */
+        .main-view {
+            width: 100%;
+            max-width: 1380px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .main-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .main-view-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ffff;
+        }
+        
+        .main-view-subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .main-view-graph {
+            height: 300px;
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-end;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            border-left: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 20px 0 0 40px;
+        }
+        
+        .graph-y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        
+        .y-axis-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+            padding-right: 10px;
+        }
+        
+        .graph-x-axis {
+            position: absolute;
+            left: 40px;
+            bottom: 0;
+            width: calc(100% - 40px);
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .x-axis-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            transform: rotate(-45deg);
+            transform-origin: left top;
+            white-space: nowrap;
+        }
+        
+        .graph-line {
+            position: absolute;
+            left: 40px;
+            bottom: 0;
+            width: calc(100% - 40px);
+            height: calc(100% - 30px);
+            z-index: 1;
+        }
+        
+        .graph-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #00ffff;
+            border-radius: 50%;
+            transform: translate(-50%, 50%);
+            z-index: 2;
+        }
+        
+        .graph-line-path {
+            stroke: #00ffff;
+            stroke-width: 3;
+            fill: none;
+        }
+        
+        .graph-area {
+            fill: url(#gradient);
+            opacity: 0.3;
+        }
+        
+        .main-view-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .time-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .time-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .time-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .time-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ffff;
+        }
+        
+        .growth-indicator {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>YouTube Channel Growth Simulator</h1>
+        <p>Experience real-time growth simulation with interactive features</p>
+    </div>
+    
+    <div class="flex-container">
+        <button class="neon-button" id="growthBtn">Growth Progress</button>
+        <button class="neon-button" id="channelBtn">Visit My Channel</button>
+        <button class="neon-button" id="transcriptBtn">Data Transcripts</button>
+    </div>
+    
+    <!-- Main View Graph Section -->
+    <div class="main-view">
+        <div class="main-view-header">
+            <div>
+                <div class="main-view-title">Channel Growth Simulation</div>
+                <div class="main-view-subtitle">Live Subscriber Growth Chart</div>
+            </div>
+            <div class="growth-indicator">Growing: <span id="growthRate">1,000,000</span> per second</div>
+        </div>
+        
+        <div class="main-view-graph" id="mainViewGraph">
+            <div class="graph-y-axis">
+                <div class="y-axis-label">500M</div>
+                <div class="y-axis-label">400M</div>
+                <div class="y-axis-label">300M</div>
+                <div class="y-axis-label">200M</div>
+                <div class="y-axis-label">100M</div>
+                <div class="y-axis-label">0</div>
+            </div>
+            
+            <svg class="graph-line" id="graphLine" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#00ffff" stop-opacity="0.7" />
+                        <stop offset="100%" stop-color="#00ffff" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+                <path class="graph-line-path" id="linePath" d=""></path>
+                <path class="graph-area" id="areaPath" d=""></path>
+            </svg>
+            
+            <div class="graph-x-axis" id="graphXAxis">
+                <!-- X-axis labels will be added dynamically -->
+            </div>
+        </div>
+        
+        <div class="main-view-footer">
+            <div class="time-info">
+                <div class="time-item">
+                    <div class="time-label">MONTHS</div>
+                    <div class="time-value" id="monthsValue">7</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">WEEKS</div>
+                    <div class="time-value" id="weeksValue">30</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">DAYS</div>
+                    <div class="time-value" id="daysValue">210</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">YEARS</div>
+                    <div class="time-value" id="yearsValue">1</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">HOURS</div>
+                    <div class="time-value" id="hoursValue">5,040</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">MINUTES</div>
+                    <div class="time-value" id="minutesValue">302,400</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">SECONDS</div>
+                    <div class="time-value" id="secondsValue">18,144,000</div>
+                </div>
+            </div>
+            
+            <div class="realtime-clock" id="mainViewClock">Current Date: Loading...</div>
+        </div>
+    </div>
+    
+    <div class="realtime-clock" id="realtimeClock">Current Date: Loading...</div>
+    
+    <div class="footer">
+        <p>Permanent growth simulation - Data persists even after refresh</p>
+    </div>
+    
+    <!-- Growth Progress Dialog -->
+    <div class="dialog-overlay" id="growthDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <div class="dialog-title">Channel Growth Statistics</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            
+            <div class="loading-bar">
+                <div class="loading-progress" id="growthLoading"></div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="growth-chart">
+                    <div class="chart-line"></div>
+                    <div class="chart-data" id="growthChart"></div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="growthTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>They Move On Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="growthTableBody">
+                            <!-- Table rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Channel Stats Dialog -->
+    <div class="dialog-overlay" id="channelDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <div class="dialog-title">Current Channel Statistics</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            
+            <div class="loading-bar">
+                <div class="loading-progress" id="channelLoading"></div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stats-sidebar">
+                    <div class="profile-section">
+                        <div class="profile-pic">
+                            <img src="https://picsum.photos/seed/youtube/300/300.jpg" alt="Channel Profile">
+                        </div>
+                        <div class="channel-name">The Rages Band</div>
+                        <p>I got blah blah matic</p>
+                    </div>
+                    
+                    <div class="channel-stats">
+                        <div class="stat-item">
+                            <span>Live Count:</span>
+                            <span class="stat-value" id="liveCount">460,702,201</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Views:</span>
+                            <span class="stat-value" id="viewCount">918,273,645</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Video Link:</span>
+                            <a href="#" id="videoLink" style="color: #00ffff;">1.png</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="main-content">
+                    <div class="video-container">
+                        <iframe id="videoPlayer" class="video-iframe" src="https://www.youtube.com/embed/TA9-5fbVjiI?enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    
+                    <div class="realtime-clock">
+                        <div>Current Date: <span id="channelDate">Loading...</span></div>
+                        <div>Views Growing: <span id="growingViews">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Transcripts Dialog -->
+    <div class="dialog-overlay" id="transcriptDialog">
+        <div class="dialog">
+            <div class="dialog-header">
+                <div class="dialog-title">Data Transcripts</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            
+            <div class="loading-bar">
+                <div class="loading-progress" id="transcriptLoading"></div>
+            </div>
+            
+            <div class="transcript-container">
+                <div class="transcript-section">
+                    <div class="transcript-title">Months</div>
+                    <div class="transcript-data">Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">Weeks</div>
+                    <div class="transcript-data">Week 1, Week 2, Week 3, Week 4</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">Days</div>
+                    <div class="transcript-data">Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">Years</div>
+                    <div class="transcript-data">2023, 2024, 2025, 2026, 2027</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">Hours</div>
+                    <div class="transcript-data">00:00 - 23:59</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">Minutes</div>
+                    <div class="transcript-data">00:00 - 59:59</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">Seconds</div>
+                    <div class="transcript-data">00:00:00 - 23:59:59</div>
+                </div>
+                
+                <div class="transcript-section">
+                    <div class="transcript-title">They Move On And Replace Me From Someone Else Count</div>
+                    <div class="transcript-data" id="transcriptCount">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const growthBtn = document.getElementById('growthBtn');
+        const channelBtn = document.getElementById('channelBtn');
+        const transcriptBtn = document.getElementById('transcriptBtn');
+        const growthDialog = document.getElementById('growthDialog');
+        const channelDialog = document.getElementById('channelDialog');
+        const transcriptDialog = document.getElementById('transcriptDialog');
+        const closeBtns = document.querySelectorAll('.close-btn');
+        const realtimeClock = document.getElementById('realtimeClock');
+        const channelDate = document.getElementById('channelDate');
+        const liveCount = document.getElementById('liveCount');
+        const viewCount = document.getElementById('viewCount');
+        const growingViews = document.getElementById('growingViews');
+        const transcriptCount = document.getElementById('transcriptCount');
+        const growthTableBody = document.getElementById('growthTableBody');
+        const growthChart = document.getElementById('growthChart');
+        const growthLoading = document.getElementById('growthLoading');
+        const channelLoading = document.getElementById('channelLoading');
+        const transcriptLoading = document.getElementById('transcriptLoading');
+        const videoLink = document.getElementById('videoLink');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const mainViewGraph = document.getElementById('mainViewGraph');
+        const linePath = document.getElementById('linePath');
+        const areaPath = document.getElementById('areaPath');
+        const graphXAxis = document.getElementById('graphXAxis');
+        const mainViewClock = document.getElementById('mainViewClock');
+        const growthRate = document.getElementById('growthRate');
+        const monthsValue = document.getElementById('monthsValue');
+        const weeksValue = document.getElementById('weeksValue');
+        const daysValue = document.getElementById('daysValue');
+        const yearsValue = document.getElementById('yearsValue');
+        const hoursValue = document.getElementById('hoursValue');
+        const minutesValue = document.getElementById('minutesValue');
+        const secondsValue = document.getElementById('secondsValue');
+        
+        // State variables
+        let moveOnCount = localStorage.getItem('moveOnCount') ? parseInt(localStorage.getItem('moveOnCount')) : 0;
+        let views = localStorage.getItem('views') ? parseInt(localStorage.getItem('views')) : 918273645;
+        let growthData = localStorage.getItem('growthData') ? JSON.parse(localStorage.getItem('growthData')) : [];
+        let graphData = [];
+        
+        // Initialize data
+        function initializeData() {
+            // Initialize growth data if empty
+            if (growthData.length === 0) {
+                const now = new Date();
+                for (let i = 0; i < 10; i++) {
+                    const date = new Date(now);
+                    date.setMinutes(now.getMinutes() - (10 - i));
+                    growthData.push({
+                        date: date.toLocaleDateString(),
+                        time: date.toLocaleTimeString(),
+                        count: moveOnCount + i * 1000
+                    });
+                }
+                localStorage.setItem('growthData', JSON.stringify(growthData));
+            }
+            
+            // Initialize graph data
+            updateGraphData();
+        }
+        
+        // Update graph data
+        function updateGraphData() {
+            graphData = [...growthData];
+            
+            // Add current data point
+            const now = new Date();
+            graphData.push({
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                count: moveOnCount
+            });
+            
+            // Keep only last 20 data points
+            if (graphData.length > 20) {
+                graphData = graphData.slice(-20);
+            }
+            
+            // Update main view graph
+            updateMainViewGraph();
+        }
+        
+        // Update main view graph
+        function updateMainViewGraph() {
+            if (graphData.length < 2) return;
+            
+            const graphWidth = mainViewGraph.clientWidth - 40;
+            const graphHeight = mainViewGraph.clientHeight - 30;
+            const maxCount = Math.max(...graphData.map(entry => entry.count));
+            
+            // Create path for line
+            let linePathD = '';
+            let areaPathD = '';
+            
+            graphData.forEach((entry, index) => {
+                const x = (index / (graphData.length - 1)) * graphWidth;
+                const y = graphHeight - (entry.count / maxCount) * graphHeight;
+                
+                if (index === 0) {
+                    linePathD += `M ${x},${y}`;
+                    areaPathD += `M ${x},${graphHeight} L ${x},${y}`;
+                } else {
+                    linePathD += ` L ${x},${y}`;
+                    areaPathD += ` L ${x},${y}`;
+                }
+            });
+            
+            // Close area path
+            areaPathD += ` L ${(graphData.length - 1) / (graphData.length - 1) * graphWidth},${graphHeight} Z`;
+            
+            // Update SVG paths
+            linePath.setAttribute('d', linePathD);
+            areaPath.setAttribute('d', areaPathD);
+            
+            // Update X-axis labels
+            graphXAxis.innerHTML = '';
+            
+            graphData.forEach((entry, index) => {
+                if (index % 2 === 0) { // Show every other label to avoid crowding
+                    const label = document.createElement('div');
+                    label.className = 'x-axis-label';
+                    label.textContent = entry.date;
+                    label.style.left = `${(index / (graphData.length - 1)) * 100}%`;
+                    graphXAxis.appendChild(label);
+                }
+            });
+        }
+        
+        // Update real-time clock
+        function updateClock() {
+            const now = new Date();
+            realtimeClock.textContent = `Current Date: ${now.toLocaleDateString()}, ${now.toLocaleTimeString()}`;
+            channelDate.textContent = `${now.toLocaleDateString()}, ${now.toLocaleTimeString()}`;
+            mainViewClock.textContent = `Current Date: ${now.toLocaleDateString()}, ${now.toLocaleTimeString()}`;
+            
+            // Update time values
+            const months = now.getMonth() + 1;
+            const weeks = Math.floor(now.getDate() / 7) + 1;
+            const days = now.getDate();
+            const years = now.getFullYear();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            monthsValue.textContent = months;
+            weeksValue.textContent = weeks;
+            daysValue.textContent = days;
+            yearsValue.textContent = years;
+            hoursValue.textContent = hours;
+            minutesValue.textContent = minutes;
+            secondsValue.textContent = seconds;
+        }
+        
+        // Update counters
+        function updateCounters() {
+            moveOnCount += 1000000; // Increase by 1 million per second
+            views += 2000000; // Increase by 2 million per second (2x speed)
+            
+            localStorage.setItem('moveOnCount', moveOnCount);
+            localStorage.setItem('views', views);
+            
+            liveCount.textContent = moveOnCount.toLocaleString();
+            viewCount.textContent = views.toLocaleString();
+            growingViews.textContent = views.toLocaleString();
+            transcriptCount.textContent = moveOnCount.toLocaleString();
+            growthRate.textContent = moveOnCount.toLocaleString();
+            
+            // Add new entry to growth data
+            const now = new Date();
+            growthData.push({
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                count: moveOnCount
+            });
+            
+            // Keep only last 100 entries
+            if (growthData.length > 100) {
+                growthData.shift();
+            }
+            
+            localStorage.setItem('growthData', JSON.stringify(growthData));
+            
+            // Update growth table
+            updateGrowthTable();
+            
+            // Update growth chart
+            updateGrowthChart();
+            
+            // Update main view graph
+            updateGraphData();
+        }
+        
+        // Update growth table
+        function updateGrowthTable() {
+            growthTableBody.innerHTML = '';
+            
+            // Show most recent entries first
+            const recentData = [...growthData].reverse().slice(0, 20);
+            
+            recentData.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.time}</td>
+                    <td>${entry.count.toLocaleString()}</td>
+                `;
+                growthTableBody.appendChild(row);
+            });
+        }
+        
+        // Update growth chart
+        function updateGrowthChart() {
+            growthChart.innerHTML = '';
+            
+            // Get last 20 data points
+            const chartData = [...growthData].slice(-20);
+            
+            // Find max value for scaling
+            const maxCount = Math.max(...chartData.map(entry => entry.count));
+            
+            chartData.forEach(entry => {
+                const height = (entry.count / maxCount) * 100;
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${height}%`;
+                growthChart.appendChild(bar);
+            });
+        }
+        
+        // Show loading animation
+        function showLoading(dialog, loadingBar) {
+            dialog.style.display = 'flex';
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += 5;
+                loadingBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    updateGrowthTable();
+                    updateGrowthChart();
+                    updateMainViewGraph();
+                }
+            }, 50);
+        }
+        
+        // Close all dialogs
+        function closeAllDialogs() {
+            growthDialog.style.display = 'none';
+            channelDialog.style.display = 'none';
+            transcriptDialog.style.display = 'none';
+        }
+        
+        // Event Listeners
+        growthBtn.addEventListener('click', () => {
+            showLoading(growthDialog, growthLoading);
+        });
+        
+        channelBtn.addEventListener('click', () => {
+            showLoading(channelDialog, channelLoading);
+        });
+        
+        transcriptBtn.addEventListener('click', () => {
+            showLoading(transcriptDialog, transcriptLoading);
+        });
+        
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeAllDialogs();
+            });
+        });
+        
+        // Close dialog when clicking outside
+        document.querySelectorAll('.dialog-overlay').forEach(dialog => {
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    closeAllDialogs();
+                }
+            });
+        });
+        
+        // Video link click handler
+        videoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            videoPlayer.src = "https://www.youtube.com/embed/TA9-5fbVjiI?autoplay=1";
+        });
+        
+        // Window resize handler for responsive graph
+        window.addEventListener('resize', () => {
+            updateMainViewGraph();
+        });
+        
+        // Initialize
+        initializeData();
+        updateClock();
+        setInterval(updateClock, 1000);
+        setInterval(updateCounters, 1000);
+        updateGrowthTable();
+        updateGrowthChart();
+        
+        // Initial graph update
+        setTimeout(() => {
+            updateMainViewGraph();
+        }, 500);
+    </script>
+</body>
+</html>
